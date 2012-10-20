@@ -58,7 +58,7 @@ uchar __idata zimu[27][8] =
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0xFE, 0x0C, 0x30, 0xFE, 0x00, 0x00}, /*"N",13*/
     /* (8 X 8 , Terminal ) */
-    {0x00,0x00,0x7C,0x82,0x82,0x7C,0x00,0x00},    /*"O",14*/
+    {0x00, 0x00, 0x7C, 0x82, 0x82, 0x7C, 0x00, 0x00}, /*"O",14*/
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0xFE, 0x12, 0x12, 0x0C, 0x00, 0x00}, /*"P",15*/
     /* (8 X 8 , Terminal ) */
@@ -88,13 +88,14 @@ uchar __idata zimu[27][8] =
 void delay(uchar);
 
 void
-character(const char *dat,uchar repeat)
+character(const char *dat, uchar repeat)
 {
     uchar i;
     P3 = 0xfe;
     for (i = 0; i < 8 ; i++)
     {
-        if (repeat){
+        if (repeat)
+        {
             P1 = *dat++;
             repeat = 0;
         }
@@ -122,7 +123,7 @@ void
 print(const char *str)
 {
     uchar i;
-    char last=0;
+    char last = 0;
     uchar repeat;
     while (*str)
     {
@@ -133,11 +134,11 @@ print(const char *str)
         for (i = 0; i < 50; i++)
             if ( *str != ' ' )
             {
-                character(zimu[*str - 0x41],repeat);
+                character(zimu[*str - 0x41], repeat);
             }
             else
             {
-                character(zimu[26],repeat);
+                character(zimu[26], repeat);
             }
         delay(10);
         last = *str;
@@ -159,7 +160,7 @@ port_config(void)
 void
 main(void)
 {
-    long cnt=0;
+    long cnt = 0;
     port_config();
     while (1)
     {
