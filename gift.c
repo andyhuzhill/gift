@@ -27,6 +27,7 @@ __sbit __at(0xb2) P3M0;
 // 定义 STC11F04 I/O 口配置寄存器
 
 const char *greet = " HAPPY BIRTHDAY GEORGIANA CHAIN SAIYA G ";
+// 定义要显示的字符串
 
 uchar __idata zimu[27][8] =
 {
@@ -84,9 +85,15 @@ uchar __idata zimu[27][8] =
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /*" " 26*/
 };
+// 定义26个大写字母的字模
 
 void delay(uchar);
 
+/*
+ * 函数功能：输出一个字母
+ * 参数：dat 字母的字
+ *       repeat 表示是否和上个要输出的字母重复
+ */
 void
 character(const char *dat, uchar repeat)
 {
@@ -98,18 +105,20 @@ character(const char *dat, uchar repeat)
         {
             P1 = *dat++;
             repeat = 0;
-        }
+        }               //如果有重复，则输出的字模向左移一位
         P1 = *dat++;
         delay(15);
         __asm
         mov a, _P3
         rl a
         mov _P3, a
-        __endasm;
+        __endasm;       //循环左移P3，扫描8x8点阵
     }
     P1 = 0x00;
     P3 = 0x00;
 }
+
+/* 函数功能： 延时 */
 
 void
 delay(uchar t)
@@ -119,6 +128,11 @@ delay(uchar t)
         for (y = 0; y < 15; y++);
 }
 
+/*
+ * 函数功能：输出一个字符串，目前字符串中只允许有大写英文字母和空格
+ * 参数：  *str 字符串地址
+ *
+ */
 void
 print(const char *str)
 {
@@ -134,11 +148,11 @@ print(const char *str)
         for (i = 0; i < 50; i++)
             if ( *str != ' ' )
             {
-                character(zimu[*str - 0x41], repeat);
+                character(zimu[*str - 0x41], repeat);  //输出字母
             }
             else
             {
-                character(zimu[26], repeat);
+                character(zimu[26], repeat);           //输出空格
             }
         delay(10);
         last = *str;
@@ -146,6 +160,10 @@ print(const char *str)
     }
 }
 
+/*
+ * 函数功能：配置STC单片机端口功能
+ *
+ */
 void
 port_config(void)
 {
@@ -156,6 +174,10 @@ port_config(void)
     P1M1 = 0x00; // P1 各个端口设为强推挽输出
     P1 = 0x00;;
 }
+
+/*
+ * 主函数
+ */
 
 void
 main(void)
