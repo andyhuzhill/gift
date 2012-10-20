@@ -19,8 +19,6 @@
 
 typedef unsigned char uchar;
 
-__sbit __at(0xb0) hang; // P3
-__sbit __at(0x90) lie;  // P1
 __sbit __at(0x91) P1M1;
 __sbit __at(0x92) P1M0;
 __sbit __at(0xb1) P3M1;
@@ -28,9 +26,7 @@ __sbit __at(0xb2) P3M0;
 
 // 定义 STC11F04 I/O 口配置寄存器
 
-
-const char *name = "GEORGIANA CHAIN";
-const char *name2 = "SAIYA G";
+const char *greet = " HAPPY BIRTHDAY GEORGIANA CHAIN SAIYA G ";
 
 uchar __idata zimu[27][8] =
 {
@@ -62,7 +58,7 @@ uchar __idata zimu[27][8] =
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0xFE, 0x0C, 0x30, 0xFE, 0x00, 0x00}, /*"N",13*/
     /* (8 X 8 , Terminal ) */
-    {0x00, 0x00, 0xFE, 0x82, 0x82, 0xFE, 0x00, 0x00}, /*"O",14*/
+    {0x00,0x00,0x7C,0x82,0x82,0x7C,0x00,0x00},    /*"O",14*/
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0xFE, 0x12, 0x12, 0x0C, 0x00, 0x00}, /*"P",15*/
     /* (8 X 8 , Terminal ) */
@@ -72,7 +68,7 @@ uchar __idata zimu[27][8] =
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0x4C, 0x92, 0x92, 0x64, 0x00, 0x00}, /*"S",18*/
     /* (8 X 8 , Terminal ) */
-    {0x00, 0x00, 0x02, 0xFE, 0x02, 0x02, 0x00, 0x00}, /*"T",19*/
+    {0x00, 0x00, 0x02, 0x02, 0xFE, 0x02, 0x02, 0x00}, /*"T",19*/
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0x7E, 0x80, 0x80, 0x7E, 0x00, 0x00}, /*"U",20*/
     /* (8 X 8 , Terminal ) */
@@ -92,20 +88,26 @@ uchar __idata zimu[27][8] =
 void delay(uchar);
 
 void
-show(char *dat)
+character(const char *dat,uchar repeat)
 {
     uchar i;
-    lie = 0xfe;
+    P3 = 0xfe;
     for (i = 0; i < 8 ; i++)
     {
-        __asm
-        mov a, _lie
-        rl a
-        mov _lie, a
-        __endasm;
-        hang = *dat++;
+        if (repeat){
+            P1 = *dat++;
+            repeat = 0;
+        }
+        P1 = *dat++;
         delay(15);
+        __asm
+        mov a, _P3
+        rl a
+        mov _P3, a
+        __endasm;
     }
+    P1 = 0x00;
+    P3 = 0x00;
 }
 
 void
@@ -117,21 +119,29 @@ delay(uchar t)
 }
 
 void
-print(char *str)
+print(const char *str)
 {
     uchar i;
-    while(*str++)
+    char last=0;
+    uchar repeat;
+    while (*str)
     {
-        for(i = 0; i < 25; i++)
-            if( *str != ' ' )
+        if (last == *str)
+            repeat = 1;
+        else
+            repeat = 0;
+        for (i = 0; i < 50; i++)
+            if ( *str != ' ' )
             {
-                show(zimu[*str - 0x41]);
+                character(zimu[*str - 0x41],repeat);
             }
             else
             {
-                show(zimu[26]);
+                character(zimu[26],repeat);
             }
-        delay(25);
+        delay(10);
+        last = *str;
+        str++;
     }
 }
 
@@ -140,21 +150,29 @@ port_config(void)
 {
     P3M0 = 0xff;
     P3M1 = 0x00; // P3各个端口设为强推挽输出
+    P3 = 0x00;
     P1M0 = 0xff;
     P1M1 = 0x00; // P1 各个端口设为强推挽输出
+    P1 = 0x00;;
 }
 
 void
 main(void)
 {
+    long cnt=0;
     port_config();
     while (1)
     {
-        print("HAPPY BIRTHDAY");
+        cnt++;
+        print(greet);
         delay(25);
-        print(name);
-        delay(25);
-        print(name2);
-        delay(25);
+        if(1000 == cnt)
+        {
+            print(" NICE TO MEET YOU GC ");
+            cnt = 0;
+            delay(25);
+        }
+        if ((cnt % 100) == 0)
+            print("THE LAZY BROWN FOX JUMPS OVER THE LAZY DOG");
     }
 }
