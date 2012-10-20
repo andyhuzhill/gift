@@ -29,8 +29,8 @@ __sbit __at(0xb2) P3M0;
 // 定义 STC11F04 I/O 口配置寄存器
 
 
-char *name = "GEORGIANA CHAIN";
-char *name2 = "SAIYA G";
+const char *name = "GEORGIANA CHAIN";
+const char *name2 = "SAIYA G";
 
 uchar __idata zimu[27][8] =
 {
@@ -150,6 +150,11 @@ main(void)
     port_config();
     while (1)
     {
-        print("HELLO WORLD");
+        print("HAPPY BIRTHDAY");
+        delay(25);
+        print(name);
+        delay(25);
+        print(name2);
+        delay(25);
     }
 }
