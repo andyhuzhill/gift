@@ -19,16 +19,19 @@
 
 typedef unsigned char uchar;
 
+// 定义 STC11F04 I/O 口配置寄存器
 __sbit __at(0x91) P1M1;
 __sbit __at(0x92) P1M0;
 __sbit __at(0xb1) P3M1;
 __sbit __at(0xb2) P3M0;
 
-// 定义 STC11F04 I/O 口配置寄存器
+// 时钟分频寄存器
+__sbit __at(0x97) CLK_DIV;
 
-const char *greet = " HAPPY BIRTHDAY GEORGIANA CHAIN SAIYA G ";
 // 定义要显示的字符串
+const char *greet = "HAPPY BIRTHDAY GEORGIANA CHAIN SAIYA G ";
 
+// 定义26个大写字母的字模
 uchar __idata zimu[27][8] =
 {
     {0x00, 0x00, 0xFC, 0x22, 0x22, 0xFC, 0x00, 0x00}, /*"A",0*/
@@ -85,7 +88,6 @@ uchar __idata zimu[27][8] =
     /* (8 X 8 , Terminal ) */
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /*" " 26*/
 };
-// 定义26个大写字母的字模
 
 void delay(uchar);
 
@@ -98,24 +100,23 @@ void
 character(const char *dat, uchar repeat)
 {
     uchar i;
-    P3 = 0xfe;
+    P1 = 0x7f;
     for (i = 0; i < 8 ; i++)
     {
         if (repeat)
         {
-            P1 = *dat++;
+            P3 = *dat++;
             repeat = 0;
         }               //如果有重复，则输出的字模向左移一位
-        P1 = *dat++;
-        delay(15);
+        P3= *dat++;
+        delay(200);
+        P3 = 0x00;
         __asm
-        mov a, _P3
-        rl a
-        mov _P3, a
+        mov a, _P1
+        rr a
+        mov _P1, a
         __endasm;       //循环左移P3，扫描8x8点阵
     }
-    P1 = 0x00;
-    P3 = 0x00;
 }
 
 /* 函数功能： 延时 */
@@ -154,6 +155,8 @@ print(const char *str)
             {
                 character(zimu[26], repeat);           //输出空格
             }
+        P1 = 0x00;
+        P3 = 0x00;
         delay(10);
         last = *str;
         str++;
@@ -161,11 +164,11 @@ print(const char *str)
 }
 
 /*
- * 函数功能：配置STC单片机端口功能
+ * 函数功能：初始化配置
  *
  */
 void
-port_config(void)
+init_config(void)
 {
     P3M0 = 0xff;
     P3M1 = 0x00; // P3各个端口设为强推挽输出
@@ -183,7 +186,7 @@ void
 main(void)
 {
     long cnt = 0;
-    port_config();
+    init_config();
     while (1)
     {
         cnt++;
