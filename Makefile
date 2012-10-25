@@ -50,7 +50,9 @@ clean:
 	rm -f *.adb
 	rm -f *.rel
 	rm -f *.lk	
-	
+	rm -f *.bin
+	rm -f *.hex
+	rm -f *.ihx
 	
 
 

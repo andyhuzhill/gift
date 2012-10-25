@@ -29,7 +29,7 @@ __sbit __at(0xb2) P3M0;
 __sbit __at(0x97) CLK_DIV;
 
 // 定义要显示的字符串
-const char *greet = "HAPPY BIRTHDAY GEORGIANA CHAIN SAIYA G ";
+const char *greet = "HAPPY BIRTHDAY TO YOU GEORGIANA CHAIN SAIYA G ";
 
 // 定义26个大写字母的字模
 uchar __idata zimu[27][8] =
@@ -109,7 +109,7 @@ character(const char *dat, uchar repeat)
             repeat = 0;
         }               //如果有重复，则输出的字模向左移一位
         P3= *dat++;
-        delay(200);
+        delay(100);
         P3 = 0x00;
         __asm
         mov a, _P1
